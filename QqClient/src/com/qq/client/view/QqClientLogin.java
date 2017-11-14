@@ -145,7 +145,6 @@ public class QqClientLogin extends JFrame implements ActionListener{
 		//如果用户点击注册
 		if(arg0.getSource()==jp2_jb1)
 		{
-
 		}
 	}
 
