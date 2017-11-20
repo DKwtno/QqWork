@@ -29,7 +29,6 @@ public class QqClientLogin extends JFrame implements ActionListener{
 	JCheckBox jp2_jcb1,jp2_jcb2;
 	
 	
-	
 	//定义南部需要的组件
 	JPanel jp1;
 	JButton jp1_jb1;
