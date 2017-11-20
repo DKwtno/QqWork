@@ -74,7 +74,7 @@ public class QqClientConServer {
 			e.printStackTrace();
 			// TODO: handle exception
 		}
-		return b;
+		return b; 
 	}
 	public boolean sendIdInfoToServer(Object o)
 	{
