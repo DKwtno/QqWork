@@ -10,6 +10,10 @@ public class ManageQqChat {
 
 	private static HashMap hm=new HashMap<String, QqChat>();
 	
+	//删除
+	public static void removeQqChat(String loginIdAnFriendId){
+		hm.remove(loginIdAnFriendId);
+	}
 	//加入
 	public static void addQqChat(String loginIdAnFriendId,QqChat qqChat)
 	{
