@@ -1,6 +1,7 @@
 /**
  * 这是服务器端的控制界面，可以完成启动服务器，关闭服务器
  * 可以管理和监控用户.
+ * @ weizhiwei
  */
 package com.qq.server.view;
 
