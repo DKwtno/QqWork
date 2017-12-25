@@ -3,13 +3,9 @@
  */
 package com.qq.client.view;
 
-import com.qq.common.*;
-import com.qq.client.tools.*;
-import java.io.*;
 import java.net.URL;
 
 import javax.swing.*;
-
 import com.qq.client.model.QqClientUser;
 import com.qq.common.User;
 import java.awt.*;
@@ -140,7 +136,9 @@ public class QqClientLogin extends JFrame implements ActionListener {
 		this.add(jp1, "South");
 		this.setSize(460, 400);
 		this.setDefaultCloseOperation(3);
-		this.setVisible(true);
+		this.setVisible(true);		
+		this.setIconImage((new ImageIcon(getClass().getResource("qq.gif")).getImage()));
+		this.setTitle("仿QQ登录界面");
 	}
 
 	// 如果点击检查账号
@@ -239,32 +237,32 @@ public class QqClientLogin extends JFrame implements ActionListener {
 			u.setPasswd(new String(jp2_jpf.getPassword()));
 
 			if (qqClientUser.checkUser(u)) {
-				try {
-					// 把创建好友列表的语句提前.
-					QqFriendList qqList = new QqFriendList(u.getUserId());
-					ManageQqFriendList.addQqFriendList(u.getUserId(), qqList);
-
-					// 发送一个要求返回在线好友的请求包.
-					ObjectOutputStream oos = new ObjectOutputStream(ManageClientConServerThread
-							.getClientConServerThread(u.getUserId()).getS().getOutputStream());
-
-					// 做一个Message
-					Message m = new Message();
-					m.setMesType(MessageType.message_get_onLineFriend);
-					// 指明我要的是这个qq号的好友情况.
-					m.setSender(u.getUserId());
-					
-					oos.writeObject(m);
-					ObjectOutputStream oos2 = new ObjectOutputStream(ManageClientConServerThread
-							.getClientConServerThread(u.getUserId()).getS().getOutputStream());
-					Message ms=new Message();
-					ms.setMesType(MessageType.message_group);
-					ms.setSender(u.getUserId());
-					oos2.writeObject(ms);
-				} catch (Exception e) {
-					e.printStackTrace();
-					// TODO: handle exception
-				}
+//				try {
+//					// 把创建好友列表的语句提前.
+//					QqFriendList qqList = new QqFriendList(u.getUserId());
+//					ManageQqFriendList.addQqFriendList(u.getUserId(), qqList);
+//
+//					// 发送一个要求返回在线好友的请求包.
+//					ObjectOutputStream oos = new ObjectOutputStream(ManageClientConServerThread
+//							.getClientConServerThread(u.getUserId()).getS().getOutputStream());
+//
+//					// 做一个Message
+//					Message m = new Message();
+//					m.setMesType(MessageType.message_get_onLineFriend);
+//					// 指明我要的是这个qq号的好友情况.
+//					m.setSender(u.getUserId());
+//					
+//					oos.writeObject(m);
+//					ObjectOutputStream oos2 = new ObjectOutputStream(ManageClientConServerThread
+//							.getClientConServerThread(u.getUserId()).getS().getOutputStream());
+//					Message ms=new Message();
+//					ms.setMesType(MessageType.message_group);
+//					ms.setSender(u.getUserId());
+//					oos2.writeObject(ms);
+//				} catch (Exception e) {
+//					e.printStackTrace();
+//					// TODO: handle exception
+//				}
 
 				// 关闭掉登录界面
 				this.dispose();
