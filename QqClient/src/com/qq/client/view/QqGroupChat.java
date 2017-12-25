@@ -1,6 +1,7 @@
 package com.qq.client.view;
 
 import java.awt.BorderLayout;
+import java.awt.CardLayout;
 import java.awt.Color;
 import java.awt.FlowLayout;
 import java.awt.Font;
@@ -14,12 +15,13 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.LinkedList;
 
+import javax.sound.sampled.AudioInputStream;
+import javax.sound.sampled.AudioSystem;
+import javax.sound.sampled.Clip;
 import javax.swing.*;
 
 import com.qq.client.data.QqGroupChatData;
 import com.qq.client.tools.ManageClientConServerThread;
-import com.qq.client.tools.ManageQqChat;
-import com.qq.client.tools.ManageQqFriendList;
 import com.qq.client.tools.ManageQqGroupChat;
 import com.qq.client.tools.ManageQqGroupChatData;
 import com.qq.client.tools.ManageQqGroupMember;
@@ -34,25 +36,24 @@ public class QqGroupChat extends JFrame implements ActionListener {
 	String title;
 	String ownerId;
 	JPanel jp_left,jp_right,jp,jp_summury,jp_member;
-	JTextArea jta,jta_text;
+	JTextArea jta,jta_text,jta_history;
+	JFrame jf;
 	JList<String> list_member;
 	JTextField jtf;
 	JLabel jbl;
-	JScrollPane jsp;
-	JButton jb,jb_exit,jb_release;
+	JScrollPane jsp,jsp1;
+	JButton jb,jb_exit,jb_release,jb_history;
 	QqGroupChatData qqGChatD;
 	static LinkedList<Message> str;
 	static String[] member;
 	public static void main(String[] args) {
-		QqGroupChat qq=new QqGroupChat("测试","1");
-//		//测试初始化
-//				for(int i=0;i<3;i++)
-//					str[i]="215125123";
+		QqGroupChat qq=new QqGroupChat("1","1");
+		//测试初始化
 	}
-	//未完成update
 	//怎么对一个已经打开的项目刷新？尤其是要更改一些已经显示的文件时
 	public void updateGroupMember(){
-		str=ManageQqGroupMember.getQqGroupMemebr(title);
+		if((str=ManageQqGroupMember.getQqGroupMemebr(title))==null)
+			return;
 		int count=0;
 		for(int i=0;i<member.length;i++){
 			member[i]="";
@@ -68,6 +69,9 @@ public class QqGroupChat extends JFrame implements ActionListener {
 					e1.printStackTrace();
 				}
 		}
+		if(list_member==null||member==null){
+			return;
+		}
 		list_member.setListData(member);
 		list_member.setFont(new Font("雅黑", Font.PLAIN, 18));
 //		jp_member.updateUI();
@@ -75,7 +79,7 @@ public class QqGroupChat extends JFrame implements ActionListener {
 	}
 	
 	
-	public QqGroupChat(String groupId,String qqId){
+	public QqGroupChat(final String groupId,String qqId){
 		this.setResizable(false);
 		if(ManageQqGroupChatData.getQqGroupChatData(groupId)==null)
 		{
@@ -116,6 +120,7 @@ public class QqGroupChat extends JFrame implements ActionListener {
 		jtf=new JTextField(30);
 		jta=new JTextArea();
 		jsp=new JScrollPane(jta);
+		jb_history=new JButton("历史记录");
 		jsp.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
 		jp=new JPanel(new FlowLayout());
 		jbl=new JLabel("成员列表；");
@@ -135,6 +140,8 @@ public class QqGroupChat extends JFrame implements ActionListener {
 		
 		jp.add(jtf,"North");
 		jp.add(jb,"Center");
+		jb_history.addActionListener(this);
+		jp_left.add(jb_history,"North");
 		jp_left.add(jsp,"Center");
 		jp_left.add(jp,"South");
 		//jp_left.setBackground(Color.red);
@@ -164,19 +171,45 @@ public class QqGroupChat extends JFrame implements ActionListener {
 		jp_right.add(jp_member);
 		jp_right.add(jb_exit);
 		jp_right.add(jb_release);
-		updateGroupMember();
+		if(member!=null)
+			updateGroupMember();
 		
 		this.add(jp_left,"West");
 		this.add(jp_right,"East");
-		this.setTitle(title);
+		this.setTitle(title+"群"+" ( "+ownerId+" )");		
+		this.setIconImage((new ImageIcon(getClass().getResource("qq.gif")).getImage()));
 		this.setSize(800, 555);
 		this.setVisible(true);
 		showAllMessage(ManageQqGroupChatData.getQqGroupChatData(groupId).getText());
 	}
 	//人满了就不能再添加了
 	//还要限制已经申请过的不能再申请了
+	public void showHistory(LinkedList<Message> lm){
+		jf=new JFrame(title+" 群的历史记录");
+		jta_history=new JTextArea();
+		jsp1=new JScrollPane(jta_history);
+		jf.add(jsp1);
+		jf.setSize(800, 600);
+		jf.setVisible(true);
+		jta_history.setFont(new Font("微软雅黑",Font.PLAIN,20));
+		jta_history.setEditable(false);
+		for(Message i:lm){
+			String info=i.getSendTime()+"  "+i.getSender()+" 说:"+"\n"+"     "+i.getCon()+"\r\n";
+			jta_history.append(info);
+		}
+		jta_history.setCaretPosition(jta_history.getDocument().getLength());
+	}
 	public void hint(Message m){
-		JOptionPane.showMessageDialog(null,m.getSender()+"群有未读消息！");
+		try {
+			AudioInputStream ais = AudioSystem.getAudioInputStream(getClass().getResource("14.wav"));
+			Clip  clip = AudioSystem.getClip();
+			clip.open(ais);
+			clip.start();
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		JOptionPane.showMessageDialog(null,m.getGetter()+"群有未读消息！");
 	}
 	private void showAllMessage(LinkedList<Message> lm){
 		this.jta.setFont(new Font("微软雅黑",Font.PLAIN,20));
@@ -202,6 +235,29 @@ public class QqGroupChat extends JFrame implements ActionListener {
 	@Override
 	public void actionPerformed(ActionEvent e) {
 		// TODO Auto-generated method stub
+		//点击历史记录
+		if(e.getSource()==jb_history){
+			if(jf!=null){
+				jf.dispose();
+				jf=null;
+				jta_history=null;
+			}
+			try {
+				ObjectOutputStream oos=new ObjectOutputStream(ManageClientConServerThread.getClientConServerThread(ownerId).getS().getOutputStream());
+				//con是群名，sender是用户
+				Message m=new Message();
+				m.setMesType(MessageType.message_ret_group_history);
+				m.setSender(ownerId);
+				m.setCon(title);
+				oos.writeObject(m);
+			} catch (Exception e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
+			}
+			
+			
+		}
+		//点击退出群组
 		if(e.getSource()==jb_exit){
 			int choice=JOptionPane.showConfirmDialog(null, "是否确定退出该群？");
 			if(choice==0){
@@ -233,6 +289,7 @@ public class QqGroupChat extends JFrame implements ActionListener {
 				this.dispose();
 			}
 		}
+		//点击踢出该群
 		if(e.getSource()==jb_release){
 			if(list_member.isSelectionEmpty()||list_member.getSelectedValue()==null){
 				JOptionPane.showMessageDialog(null, "请选中要踢出群的对象！");
@@ -259,10 +316,10 @@ public class QqGroupChat extends JFrame implements ActionListener {
 				}
 				for(int i=0;i<member.length;i++){
 					if(member[i].equals(outer)){
-						for(int j=i;j<member.length;j++){
+						for(int j=i;j<member.length-1;j++){
 							member[j]=member[j+1];
 						}
-						member[member.length]="";
+						member[member.length-1]="";
 						break;
 					}
 				}
